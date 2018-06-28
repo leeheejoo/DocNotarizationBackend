@@ -6,22 +6,51 @@ router.get('/', async function(req, res, next) {
 
 	let hash = req.query.hash;
 
-	let file = await ipfs.get(hash);
+	if(hash){
 
-	if(file) {
-		//file[0].content = file[0].content.toString('base64');
-		let ret = retcode.getSuccess();
-		ret['data'] = file[0].content.toString('base64');
-		res.send(ret);
-		return;
+		let file = await ipfs.get(hash);
+
+		if(file) {
+			//file[0].content = file[0].content.toString('base64');
+			let ret = retcode.getSuccess();
+			ret['data'] = file[0].content.toString('base64');
+			res.send(ret);
+			return;
+		}
 	}
 
 	res.send(retcode.getFail());
 });
 
 
-router.post('/', function(req, res, next) {
-  	res.send('response document');
+router.post('/', async function(req, res, next) {
+
+	let id = req.body.id;
+	let fileName = req.body.fileName;
+	let data = req.body.data;
+
+	if(id && fileName && data) {
+
+		let buffer = new Buffer(data, 'base64');
+
+		let result = await ipfs.add(fileName,buffer);
+
+		if(result[0]) {
+
+			let ret = retcode.getSuccess();
+			ret['data'] = {
+				'id' : id,
+				'fileName' : fileName,
+				'hash' : result[0].hash,
+				'size' : result[0].size
+			};
+
+			res.send(ret);
+			return;
+		}
+	}
+
+	res.send(retcode.getFail());
 });
 
 module.exports = router;
