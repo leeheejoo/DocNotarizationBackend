@@ -9,6 +9,12 @@ class returnCode {
         }
     }
     
+    getFail() {
+        return {
+            code : 1,
+            msg : `fail`
+        }
+    }
 }
 
 module.exports = new returnCode; 

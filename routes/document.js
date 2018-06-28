@@ -5,10 +5,18 @@ const router = express.Router();
 router.get('/', async function(req, res, next) {
 
 	let hash = req.query.hash;
+
 	let file = await ipfs.get(hash);
-	//console.log(file[0].content.toString('utf8'));
-	file[0].content = file[0].content.toString('base64');
-	res.send(file);
+
+	if(file) {
+		//file[0].content = file[0].content.toString('base64');
+		let ret = retcode.getSuccess();
+		ret['data'] = file[0].content.toString('base64');
+		res.send(ret);
+		return;
+	}
+
+	res.send(retcode.getFail());
 });
 
 
